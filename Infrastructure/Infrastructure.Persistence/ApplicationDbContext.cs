@@ -41,6 +41,21 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 
                 pr.Property(x => x.Kz).HasColumnName("TitleKz");
             });
+
+        modelBuilder.Entity<PracticeWork>()
+            .OwnsOne(x => x.Title, pr => pr.ToJson());
+        
+        modelBuilder.Entity<PracticeWork>()
+            .OwnsOne(x => x.Description, pr =>
+            {
+                pr.Property(x => x.En).HasColumnName("DescriptionEn");
+                
+                pr.Property(x => x.Ru).HasColumnName("DescriptionRu");
+                
+                pr.Property(x => x.Kz).HasColumnName("DescriptionKz");
+            });
+        
+        base.OnModelCreating(modelBuilder);
     }
 
 
@@ -59,4 +74,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Question> Questions { get; set; }
     
     public DbSet<Answer> Answers { get; set; }
+    
+    public DbSet<PracticeWork> PracticeWorks { get; set; }
 }
