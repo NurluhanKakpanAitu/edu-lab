@@ -1,3 +1,4 @@
+using Application.Tests.Dto;
 using Application.Tests.Vm;
 
 namespace Application.Tests.Services;
@@ -35,4 +36,16 @@ public interface ITestService
     Task UpdateQuestion(Guid questionId, QuestionDto questionDto, CancellationToken cancellationToken = default);
     
     Task UpdateAnswer(Guid answerId, AnswerDto answerDto, CancellationToken cancellationToken = default);
+    
+    
+    Task CreatePracticeWork(PracticeWorkDto practiceWorkDto, CancellationToken cancellationToken = default);
+    
+    Task UpdatePracticeWork(Guid practiceWorkId, PracticeWorkDto practiceWorkDto, CancellationToken cancellationToken = default);
+    
+    Task DeletePracticeWork(Guid practiceWorkId, CancellationToken cancellationToken = default);
+    
+    Task<PracticeWorkVm> GetPracticeWork(Guid moduleId, CancellationToken cancellationToken = default);
+    
+    
+    Task<GeminiResponse> GetPracticeWorkResult(PracticeWorkResultDto resultDto, CancellationToken cancellationToken = default);
 }

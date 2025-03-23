@@ -24,5 +24,6 @@ public static class ServiceRegistration
         
         services.AddAutoMapper(typeof(ServiceRegistration).Assembly);
         services.AddHttpContextAccessor();
+        services.AddHttpClient();
     }
 }

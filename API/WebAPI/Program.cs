@@ -63,6 +63,16 @@ builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddPersistenceInfrastructure(builder.Configuration);
 builder.Services.AddFileInfrastructure(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(corsPolicyBuilder =>
+    {
+        corsPolicyBuilder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -77,6 +87,8 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.MapControllers();
+
+app.UseCors();
 
 
 using (var scope = app.Services.CreateScope())

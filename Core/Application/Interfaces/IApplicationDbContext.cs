@@ -17,5 +17,8 @@ public interface IApplicationDbContext
     public DbSet<Question> Questions { get; set; }
     
     public DbSet<Answer> Answers { get; set; }
+    
+    public DbSet<PracticeWork> PracticeWorks { get; set; }
+    
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

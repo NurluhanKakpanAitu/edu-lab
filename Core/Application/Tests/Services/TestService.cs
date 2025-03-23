@@ -1,11 +1,17 @@
+using System.Text;
 using Application.Interfaces;
+using Application.Tests.Dto;
 using Application.Tests.Vm;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Application.Tests.Services;
 
-public class TestService(IApplicationDbContext dbContext) : ITestService
+public class TestService(
+    IApplicationDbContext dbContext,
+    HttpClient client
+    ) : ITestService
 {
     public async Task CreateTest(TestDto testDto, CancellationToken cancellationToken = default)
     {
@@ -306,4 +312,150 @@ public class TestService(IApplicationDbContext dbContext) : ITestService
         
         await dbContext.SaveChangesAsync(cancellationToken); 
     }
+
+    public async Task CreatePracticeWork(PracticeWorkDto practiceWorkDto, CancellationToken cancellationToken = default)
+    {
+        var module = await dbContext.Modules.FirstOrDefaultAsync(x => x.Id == practiceWorkDto.ModuleId, cancellationToken);
+        
+        if (module == null)
+            throw new Exception("Module not found");
+        
+        var practiceWork = new PracticeWork
+        {
+            Title = practiceWorkDto.Title,
+            Description = practiceWorkDto.Description,
+            ImagePath = practiceWorkDto.ImagePath,
+            ModuleId = practiceWorkDto.ModuleId
+        };
+        
+        await dbContext.PracticeWorks.AddAsync(practiceWork, cancellationToken);
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdatePracticeWork(Guid practiceWorkId, PracticeWorkDto practiceWorkDto,
+        CancellationToken cancellationToken = default)
+    {
+        var practiceWork = await dbContext.PracticeWorks.FirstOrDefaultAsync(x => x.Id == practiceWorkId, cancellationToken);
+        
+        if (practiceWork == null)
+            throw new Exception("Practice work not found");
+        
+        
+        practiceWork.Title = practiceWorkDto.Title;
+        practiceWork.Description = practiceWorkDto.Description;
+        practiceWork.ImagePath = practiceWorkDto.ImagePath;
+        practiceWork.ModuleId = practiceWorkDto.ModuleId;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeletePracticeWork(Guid practiceWorkId, CancellationToken cancellationToken = default)
+    {
+        var practiceWork = await dbContext.PracticeWorks.FirstOrDefaultAsync(x => x.Id == practiceWorkId, cancellationToken);
+        
+        if (practiceWork == null)
+            throw new Exception("Practice work not found");
+        
+        dbContext.PracticeWorks.Remove(practiceWork);
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<PracticeWorkVm> GetPracticeWork(Guid moduleId, CancellationToken cancellationToken = default)
+    {
+        var practiceWork = await dbContext.PracticeWorks
+            .AsNoTracking()   
+            .Include(x => x.Module)
+            .FirstOrDefaultAsync(x => x.ModuleId == moduleId, cancellationToken);
+        
+        if (practiceWork == null)
+            throw new Exception("Practice work not found");
+        
+        return new PracticeWorkVm
+        {
+            Id = practiceWork.Id,
+            Title = practiceWork.Title,
+            Description = practiceWork.Description,
+            ImagePath = practiceWork.ImagePath,
+        };
+    }
+
+    public async Task<GeminiResponse> GetPracticeWorkResult(PracticeWorkResultDto resultDto, CancellationToken cancellationToken = default)
+    {
+        const string apiKey = "AIzaSyBUs9vQy31-bpyvSoTQz6NxwJ1P23lwYR8";
+        var practiceWork = await dbContext.PracticeWorks
+            .Include(x => x.Module)
+            .FirstOrDefaultAsync(x => x.Id == resultDto.PracticeWorkId, cancellationToken: cancellationToken);
+        
+        if (practiceWork == null)
+            throw new Exception("Practice work not found");
+        
+        var practiceWorkDescription = practiceWork.Description["en"];
+        
+        const string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={apiKey}";
+        
+        var possibleAnswers = new[]
+        {
+            "The code is correct.",
+            "The code is incorrect.",
+            "The code is not working."
+        };
+        
+        var promptToGemini = $$"""
+                               Here is a description of the code: {{practiceWorkDescription}} and possible answers: {{string.Join(", ", possibleAnswers)}} and the code: {{resultDto.Code}} Give me like this: 
+                               {
+                                   "answer": "The code is correct.",
+                                   "explanation": "The code is correct because..."
+                               }
+                               """;
+        
+        var requestBody = new
+        {
+            contents = new[]
+            {
+                new
+                {
+                    parts = new[]
+                    {
+                        new { text = promptToGemini }
+                    }
+                }
+            }
+        };
+        
+        
+        var jsonRequest = JsonConvert.SerializeObject(requestBody);
+        var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+        // Send POST request
+        var response = await client.PostAsync(url, content, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        // Parse response
+        var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
+        dynamic? data = JsonConvert.DeserializeObject(jsonResponse);
+        
+        string? text = data?.candidates[0]?.content?.parts[0]?.text?.ToString();
+        
+        if (text == null)
+            throw new Exception("Gemini response is empty");
+        
+        text = text.Replace("```", "");
+        text = text.Replace("json", "");
+        text = text.Trim();
+        
+        
+        var geminiResponse = JsonConvert.DeserializeObject<GeminiResponse>(text);
+
+        return geminiResponse ?? throw new Exception("Gemini response is empty");
+    }
+}
+
+
+public class GeminiResponse
+{
+    public string? Answer { get; set; }
+    
+    public string? Explanation { get; set; }
 }

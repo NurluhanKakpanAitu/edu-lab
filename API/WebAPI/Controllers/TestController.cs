@@ -1,4 +1,5 @@
 using Application.Tests;
+using Application.Tests.Dto;
 using Application.Tests.Services;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controller;
@@ -220,5 +221,75 @@ public class TestController(ITestService testService) : BaseController
             return ResponseFail(ex.Message);
         }
     }
-
+    
+    [HttpPost("practice-works")]
+    public async Task<IActionResult> CreatePracticeWork([FromBody] PracticeWorkDto practiceWorkDto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await testService.CreatePracticeWork(practiceWorkDto, cancellationToken);
+            return ResponseOk("Practice work created successfully.");
+        }
+        catch (Exception ex)
+        {
+            return ResponseFail(ex.Message);
+        }
+    }
+    
+    [HttpPut("practice-works/{practiceWorkId:guid}")]
+    public async Task<IActionResult> UpdatePracticeWork(Guid practiceWorkId, [FromBody] PracticeWorkDto practiceWorkDto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await testService.UpdatePracticeWork(practiceWorkId, practiceWorkDto, cancellationToken);
+            return ResponseOk("Practice work updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            return ResponseFail(ex.Message);
+        }
+    }
+    
+    [HttpDelete("practice-works/{practiceWorkId:guid}")]
+    public async Task<IActionResult> DeletePracticeWork(Guid practiceWorkId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await testService.DeletePracticeWork(practiceWorkId, cancellationToken);
+            return ResponseOk("Practice work deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return ResponseFail(ex.Message);
+        }
+    }
+    
+    [HttpGet("module/{moduleId:guid}/practice-works")]
+    
+    public async Task<IActionResult> GetPracticeWork(Guid moduleId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var practiceWork = await testService.GetPracticeWork(moduleId, cancellationToken);
+            return ResponseOk(practiceWork);
+        }
+        catch (Exception ex)
+        {
+            return ResponseFail(ex.Message);
+        }
+    }
+    
+    [HttpPost("practice-work-result")]
+    public async Task<IActionResult> CreatePracticeWorkResult([FromBody] PracticeWorkResultDto practiceWorkResultDto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await testService.GetPracticeWorkResult(practiceWorkResultDto, cancellationToken);
+            return ResponseOk(response);
+        }
+        catch (Exception ex)
+        {
+            return ResponseFail(ex.Message);
+        }
+    }
 }
