@@ -292,4 +292,18 @@ public class TestController(ITestService testService) : BaseController
             return ResponseFail(ex.Message);
         }
     }
+    
+    [HttpPost("test-result")]
+    public async Task<IActionResult> CreateTestResult([FromBody] TestResultDto testResultDto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await testService.GetTestResult(testResultDto, cancellationToken);
+            return ResponseOk(response);
+        }
+        catch (Exception ex)
+        {
+            return ResponseFail(ex.Message);
+        }
+    }
 }

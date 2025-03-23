@@ -1,3 +1,4 @@
+using Application.Tests.Dto;
 using Domain.Entities.Base;
 
 namespace Application.Tests;

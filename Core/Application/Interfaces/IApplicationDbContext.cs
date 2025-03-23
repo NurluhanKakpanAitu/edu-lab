@@ -5,7 +5,7 @@ namespace Application.Interfaces;
 
 public interface IApplicationDbContext
 {
-    public DbSet<Domain.Entities.User> Users { get; set; }
+    public DbSet<User> Users { get; set; }
     
     
     public DbSet<Course> Courses { get; set; }
@@ -19,6 +19,8 @@ public interface IApplicationDbContext
     public DbSet<Answer> Answers { get; set; }
     
     public DbSet<PracticeWork> PracticeWorks { get; set; }
+    
+    public DbSet<UserTestResult> UserTestResults { get; set; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

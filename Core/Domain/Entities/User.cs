@@ -21,4 +21,6 @@ public class User : BaseEntity, IAuditable
     public DateTime? RefreshTokenExpiry { get; set; }
     
     public string? About { get; set; }
+    
+    public List<UserTestResult> UserTestResults { get; set; } = [];
 }

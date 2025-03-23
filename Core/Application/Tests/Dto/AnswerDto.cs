@@ -1,6 +1,6 @@
 using Domain.Entities.Base;
 
-namespace Application.Tests;
+namespace Application.Tests.Dto;
 
 public class AnswerDto
 {

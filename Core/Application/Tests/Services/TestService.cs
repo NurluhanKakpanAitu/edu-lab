@@ -1,8 +1,10 @@
+using System.Security.Claims;
 using System.Text;
 using Application.Interfaces;
 using Application.Tests.Dto;
 using Application.Tests.Vm;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -10,6 +12,7 @@ namespace Application.Tests.Services;
 
 public class TestService(
     IApplicationDbContext dbContext,
+    IHttpContextAccessor contextAccessor,
     HttpClient client
     ) : ITestService
 {
@@ -450,6 +453,44 @@ public class TestService(
         var geminiResponse = JsonConvert.DeserializeObject<GeminiResponse>(text);
 
         return geminiResponse ?? throw new Exception("Gemini response is empty");
+    }
+
+    public async Task<TestResultVm> GetTestResult(TestResultDto resultDto, CancellationToken cancellationToken = default)
+    {
+        var currentUserId = contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new Exception("User not found");
+        
+        var test = await dbContext.Tests
+            .Include(x => x.Questions)
+            .ThenInclude(x => x.Answers)
+            .FirstOrDefaultAsync(x => x.Id == resultDto.TestId, cancellationToken);
+        
+        if (test == null)
+            throw new Exception("Test not found");
+
+
+        var user = await dbContext.Users
+            .Include(x => x.UserTestResults)
+            .FirstOrDefaultAsync(x => x.Id == Guid.Parse(currentUserId), cancellationToken);
+        
+        if (user == null)
+            throw new Exception("User not found");
+        
+        var userTestResult = new UserTestResult
+        {
+            TestId = resultDto.TestId,
+            UserId = Guid.Parse(currentUserId),
+            TestResults = resultDto.Results,
+        };
+        
+        user.UserTestResults.Add(userTestResult);
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return new TestResultVm
+        {
+            MaxScore = test.Questions.Count,
+            Score = resultDto.Results.Count(x => x.IsCorrect),
+        };
     }
 }
 

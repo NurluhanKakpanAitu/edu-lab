@@ -48,4 +48,7 @@ public interface ITestService
     
     
     Task<GeminiResponse> GetPracticeWorkResult(PracticeWorkResultDto resultDto, CancellationToken cancellationToken = default);
+    
+    
+    Task<TestResultVm> GetTestResult(TestResultDto resultDto, CancellationToken cancellationToken = default);
 }

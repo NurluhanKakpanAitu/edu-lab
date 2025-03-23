@@ -54,12 +54,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 
                 pr.Property(x => x.Kz).HasColumnName("DescriptionKz");
             });
+
+        modelBuilder.Entity<UserTestResult>()
+            .OwnsOne(x => x.TestResults, pr => pr.ToJson());
         
         base.OnModelCreating(modelBuilder);
     }
 
 
     public DbSet<User> Users { get; set; }
+    
+    public DbSet<UserTestResult> UserTestResults { get; set; }
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return await base.SaveChangesAsync(cancellationToken);
