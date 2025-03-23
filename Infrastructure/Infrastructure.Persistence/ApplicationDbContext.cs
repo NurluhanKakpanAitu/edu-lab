@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Interfaces;
 using Domain.Entities;
 
@@ -56,7 +57,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             });
 
         modelBuilder.Entity<UserTestResult>()
-            .OwnsOne(x => x.TestResults, pr => pr.ToJson());
+            .Property(u => u.TestResults)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),  // Serialize
+                v => JsonSerializer.Deserialize<List<TestResult>>(v, new JsonSerializerOptions())!  // Deserialize
+            );
         
         base.OnModelCreating(modelBuilder);
     }
