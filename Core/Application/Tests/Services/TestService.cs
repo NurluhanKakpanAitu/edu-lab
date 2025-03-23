@@ -406,7 +406,8 @@ public class TestService(
                                Here is a description of the code: {{practiceWorkDescription}} and possible answers: {{string.Join(", ", possibleAnswers)}} and the code: {{resultDto.Code}} Give me like this: 
                                {
                                    "answer": "The code is correct.",
-                                   "explanation": "The code is correct because..."
+                                   "explanation": "The code is correct because...",
+                                   "isCorrect": "true"
                                }
                                """;
         
@@ -458,4 +459,6 @@ public class GeminiResponse
     public string? Answer { get; set; }
     
     public string? Explanation { get; set; }
+    
+    public bool IsCorrect { get; set; }
 }
