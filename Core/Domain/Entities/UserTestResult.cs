@@ -15,4 +15,8 @@ public class UserTestResult : BaseEntity
     
     [ForeignKey(nameof(TestId))]
     public Test? Test { get; set; }
+
+    public int MaxScore => TestResults.Select(x => x.QuestionId).Count();
+    
+    public int Score => TestResults.Count(x => x.IsCorrect);
 }

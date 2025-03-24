@@ -1,8 +1,10 @@
 using Application.Courses.Dto;
 using Application.Courses.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Controller;
 
-namespace WebAPI.Controller;
+namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -31,6 +33,7 @@ public class CourseController(ICourseService courseService) : BaseController
     }
     
     [HttpGet("all")]
+    [Authorize]
     public async Task<IActionResult> GetAllCourses(CancellationToken cancellationToken = default)
     {
         var courses = await courseService.GetAllCourses(cancellationToken);
@@ -38,6 +41,7 @@ public class CourseController(ICourseService courseService) : BaseController
     }
     
     [HttpGet("{courseId:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetCourse([FromRoute] Guid courseId, CancellationToken cancellationToken = default)
     {
         var course = await courseService.GetCourse(courseId, cancellationToken);

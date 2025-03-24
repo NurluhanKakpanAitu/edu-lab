@@ -1,6 +1,7 @@
 using Application.Tests;
 using Application.Tests.Dto;
 using Application.Tests.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controller;
 
@@ -97,6 +98,7 @@ public class TestController(ITestService testService) : BaseController
     }
     
     [HttpGet("{testId:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetTest(Guid testId, CancellationToken cancellationToken)
     {
         try
@@ -111,6 +113,7 @@ public class TestController(ITestService testService) : BaseController
     }
 
     [HttpGet("{testId:guid}/questions")]
+    [Authorize]
     public async Task<IActionResult> GetAllQuestions(Guid testId, CancellationToken cancellationToken)
     {
         try
@@ -125,6 +128,7 @@ public class TestController(ITestService testService) : BaseController
     }
 
     [HttpGet("questions/{questionId:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetQuestion(Guid questionId, CancellationToken cancellationToken)
     {
         try
@@ -139,6 +143,7 @@ public class TestController(ITestService testService) : BaseController
     }
 
     [HttpGet("questions/{questionId:guid}/answers")]
+    [Authorize]
     public async Task<IActionResult> GetAllAnswers(Guid questionId, CancellationToken cancellationToken)
     {
         try
@@ -153,6 +158,7 @@ public class TestController(ITestService testService) : BaseController
     }
 
     [HttpGet("answers/{answerId:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetAnswer(Guid answerId, CancellationToken cancellationToken)
     {
         try
@@ -251,6 +257,7 @@ public class TestController(ITestService testService) : BaseController
     }
     
     [HttpDelete("practice-works/{practiceWorkId:guid}")]
+    
     public async Task<IActionResult> DeletePracticeWork(Guid practiceWorkId, CancellationToken cancellationToken)
     {
         try
@@ -265,6 +272,7 @@ public class TestController(ITestService testService) : BaseController
     }
     
     [HttpGet("module/{moduleId:guid}/practice-works")]
+    [Authorize]
     
     public async Task<IActionResult> GetPracticeWork(Guid moduleId, CancellationToken cancellationToken)
     {
@@ -280,6 +288,7 @@ public class TestController(ITestService testService) : BaseController
     }
     
     [HttpPost("practice-work-result")]
+    [Authorize]
     public async Task<IActionResult> CreatePracticeWorkResult([FromBody] PracticeWorkResultDto practiceWorkResultDto, CancellationToken cancellationToken)
     {
         try
@@ -294,6 +303,7 @@ public class TestController(ITestService testService) : BaseController
     }
     
     [HttpPost("test-result")]
+    [Authorize]
     public async Task<IActionResult> CreateTestResult([FromBody] TestResultDto testResultDto, CancellationToken cancellationToken)
     {
         try

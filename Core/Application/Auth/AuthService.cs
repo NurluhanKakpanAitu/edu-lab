@@ -48,9 +48,9 @@ public class AuthService(
 
     public async Task Logout()
     {
-        var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new UnauthorizedAccessException("User not authorized.");
         
-        var user = await context.Users.FindAsync(userId);
+        var user = await context.Users.FindAsync(Guid.Parse(userId));
         
         if (user == null)
             throw new InvalidOperationException("User not found.");

@@ -405,13 +405,16 @@ public class TestService(
             "The code is not working."
         };
         
+        var lang = contextAccessor.HttpContext.Request.Headers["Lang"].ToString();
+        
         var promptToGemini = $$"""
-                               Here is a description of the code: {{practiceWorkDescription}} and possible answers: {{string.Join(", ", possibleAnswers)}} and the code: {{resultDto.Code}} Give me like this: 
+                               Here is a description of the code: {{practiceWorkDescription}} and possible answers: {{string.Join(", ", possibleAnswers)}} and the code: {{resultDto.Code}} make 3 test and  give me answer only  in this format because I need Deserialize it to object: 
                                {
                                    "answer": "The code is correct.",
                                    "explanation": "The code is correct because...",
                                    "isCorrect": "true"
                                }
+                               give answer by this locale: {{lang}}
                                """;
         
         var requestBody = new
@@ -459,36 +462,42 @@ public class TestService(
     {
         var currentUserId = contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new Exception("User not found");
         
-        var test = await dbContext.Tests
-            .Include(x => x.Questions)
-            .ThenInclude(x => x.Answers)
-            .FirstOrDefaultAsync(x => x.Id == resultDto.TestId, cancellationToken);
+        var testExists = await dbContext.Tests
+            .AnyAsync(x => x.Id == resultDto.TestId, cancellationToken);
         
-        if (test == null)
+        if (!testExists)
             throw new Exception("Test not found");
-
-
-        var user = await dbContext.Users
-            .Include(x => x.UserTestResults)
-            .FirstOrDefaultAsync(x => x.Id == Guid.Parse(currentUserId), cancellationToken);
         
-        if (user == null)
+        var userExists = await dbContext.Users
+            .AnyAsync(x => x.Id == Guid.Parse(currentUserId), cancellationToken);
+        
+        if (!userExists)
             throw new Exception("User not found");
         
-        var userTestResult = new UserTestResult
+        var userTestResult = await dbContext.UserTestResults
+            .FirstOrDefaultAsync(x => x.UserId == Guid.Parse(currentUserId) && x.TestId == resultDto.TestId, cancellationToken);
+
+        if (userTestResult != null)
         {
-            TestId = resultDto.TestId,
-            UserId = Guid.Parse(currentUserId),
-            TestResults = resultDto.Results,
-        };
-        
-        user.UserTestResults.Add(userTestResult);
+            userTestResult.TestResults = resultDto.Results;
+        }
+        else
+        {
+            var newUserTestResult = new UserTestResult
+            {
+                UserId = Guid.Parse(currentUserId),
+                TestId = resultDto.TestId,
+                TestResults = resultDto.Results
+            };
+            
+            await dbContext.UserTestResults.AddAsync(newUserTestResult, cancellationToken);
+        }
         
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new TestResultVm
         {
-            MaxScore = test.Questions.Count,
+            MaxScore = resultDto.Results.Count,
             Score = resultDto.Results.Count(x => x.IsCorrect),
         };
     }

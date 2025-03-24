@@ -9,7 +9,7 @@ public static class ServiceRegistration
 {
     public static void AddFileInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<MinioConfig>(x => configuration.GetSection("MinioConfig").Bind(x));
+        services.Configure<MinioConfig>(x => configuration.GetSection("Minio").Bind(x));
 
         services.AddSingleton<IMinioClient>(
             serviceProvider =>

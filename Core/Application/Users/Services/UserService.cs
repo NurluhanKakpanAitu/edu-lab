@@ -1,9 +1,16 @@
+using System.Security.Claims;
 using Application.Interfaces;
 using Application.Users.Dto;
+using Domain.Entities;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.Services;
 
-public class UserService(IApplicationDbContext dbContext) : IUserService
+public class UserService(
+    IApplicationDbContext dbContext,
+    IHttpContextAccessor contextAccessor
+    ) : IUserService
 {
     public async Task UpdateUserAsync(Guid id, UserDto request, CancellationToken cancellationToken = default)
     {
@@ -25,5 +32,18 @@ public class UserService(IApplicationDbContext dbContext) : IUserService
         }
         
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<UserTestResult?> GetUserTestResultAsync(Guid testId, CancellationToken cancellationToken)
+    {
+        var userId = contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (userId is null)
+            throw new UnauthorizedAccessException("Пользователь не авторизован");
+        
+        var userTestResult = await dbContext.UserTestResults
+            .FirstOrDefaultAsync(x => x.UserId == Guid.Parse(userId) && x.TestId == testId, cancellationToken);
+
+        return userTestResult;
     }
 }
