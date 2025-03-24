@@ -9,7 +9,7 @@
       - minio
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5433;Database=eduLabDb;Username=edulab_user;Password=123456
-      - Minio__Endpoint=http://minio:9000
+      - Minio__Endpoint=http://minio:9002
       - Minio__AccessKey=Bc2HLdxLXjgtQbU5YloE
       - Minio__SecretKey=wk0CumU68bDpFID9SC60rMKOIXXZmmVQmuPbesTd
       - Minio__DefaultBucket=course
