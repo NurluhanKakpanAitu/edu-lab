@@ -19,6 +19,9 @@
       - JwtSettings__Audience=http://localhost:5000
       - JwtSettings__ExpirationInMinutes=60
       - JwtSettings__RefreshTokenExpirationInDays=7
+    ports:
+        - "5000:8080"
+        - "5001:8081"
 
   db:
     image: postgres:latest
