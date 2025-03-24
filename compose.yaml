@@ -9,7 +9,7 @@
       - "8081:8081"
     environment:
       - ConnectionStrings__DefaultConnection=Host=85.202.192.76;Port=5432;Database=eduLabDb;Username=auyl_user;Password=auyl_password
-      - Minio__Endpoint=http://minio:9000
+      - Minio__Endpoint=85.202.192.76:9000
       - Minio__AccessKey=gv3IohIp2G1k84OzCMRJ
       - Minio__SecretKey=4eB8jLySR7mDdvMvIJDfSSVoYAxMrYBN9MvgN28u
       - Minio__DefaultBucket=course
