@@ -4,6 +4,9 @@
     build:
       context: .
       dockerfile: API/WebAPI/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
     environment:
       - ConnectionStrings__DefaultConnection=Host=85.202.192.76;Port=5432;Database=eduLabDb;Username=auyl_user;Password=auyl_password
       - Minio__Endpoint=http://minio:9000
