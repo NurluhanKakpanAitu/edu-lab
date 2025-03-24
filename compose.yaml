@@ -4,14 +4,11 @@
     build:
       context: .
       dockerfile: API/WebAPI/Dockerfile
-    depends_on:
-      - db
-      - minio
     environment:
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5433;Database=eduLabDb;Username=edulab_user;Password=123456
-      - Minio__Endpoint=http://minio:9002
-      - Minio__AccessKey=Bc2HLdxLXjgtQbU5YloE
-      - Minio__SecretKey=wk0CumU68bDpFID9SC60rMKOIXXZmmVQmuPbesTd
+      - ConnectionStrings__DefaultConnection=Host=85.202.192.76;Port=5432;Database=eduLabDb;Username=auyl_user;Password=auyl_password
+      - Minio__Endpoint=http://minio:9000
+      - Minio__AccessKey=gv3IohIp2G1k84OzCMRJ
+      - Minio__SecretKey=4eB8jLySR7mDdvMvIJDfSSVoYAxMrYBN9MvgN28u
       - Minio__DefaultBucket=course
       - Minio__UseSSL=false
       - JwtSettings__Secret=This is a secret key for jwt token generation and validation process
@@ -19,35 +16,3 @@
       - JwtSettings__Audience=http://localhost:5000
       - JwtSettings__ExpirationInMinutes=60
       - JwtSettings__RefreshTokenExpirationInDays=7
-    ports:
-        - "6000:8080"
-        - "6001:8081"
-
-  db:
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_DB: eduLabDb
-      POSTGRES_USER: edulab_user
-      POSTGRES_PASSWORD: 123456
-    ports:
-      - "5433:5433"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  minio:
-    image: minio/minio
-    restart: always
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: Bc2HLdxLXjgtQbU5YloE
-      MINIO_ROOT_PASSWORD: wk0CumU68bDpFID9SC60rMKOIXXZmmVQmuPbesTd
-    ports:
-      - "9002:9002"
-      - "9003:9003"
-    volumes:
-      - minio_data:/data
-
-volumes:
-  pgdata:
-  minio_data:
