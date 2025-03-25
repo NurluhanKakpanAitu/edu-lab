@@ -13,4 +13,8 @@ public class ModuleGetAllVm
     public string? VideoPath { get; set; }
     
     public int Order { get; set; }
+    
+    public Guid CourseId { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
 }

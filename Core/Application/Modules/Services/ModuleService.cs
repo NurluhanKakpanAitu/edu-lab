@@ -6,7 +6,7 @@ namespace Application.Modules.Services;
 
 public class ModuleService(IApplicationDbContext dbContext) : IModuleService
 {
-    public async Task CreateAsync(ModuleDto moduleDto, CancellationToken cancellationToken = default)
+    public async Task<Guid> CreateAsync(ModuleDto moduleDto, CancellationToken cancellationToken = default)
     {
         var existsCourse = await dbContext.Courses.AnyAsync(x => x.Id == moduleDto.CourseId, cancellationToken);
         
@@ -19,12 +19,16 @@ public class ModuleService(IApplicationDbContext dbContext) : IModuleService
             Description = moduleDto.Description,
             VideoPath = moduleDto.VideoPath,
             Order = moduleDto.Order,
-            CourseId = moduleDto.CourseId
+            CourseId = moduleDto.CourseId,
+            Id = Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow
         };
         
         await dbContext.Modules.AddAsync(module, cancellationToken);
         
         await dbContext.SaveChangesAsync(cancellationToken);
+        
+        return module.Id;
     }
 
     public async Task UpdateAsync(Guid id, ModuleDto moduleDto, CancellationToken cancellationToken = default)
@@ -66,8 +70,12 @@ public class ModuleService(IApplicationDbContext dbContext) : IModuleService
                 Title = x.Title,
                 Description = x.Description,
                 VideoPath = x.VideoPath,
-                Order = x.Order
+                Order = x.Order,
+                CourseId = x.CourseId,
+                CreatedAt = x.CreatedAt
             })
+            .OrderBy(x => x.Order)
+            .ThenBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 }

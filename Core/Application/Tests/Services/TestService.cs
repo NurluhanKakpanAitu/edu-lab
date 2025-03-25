@@ -30,6 +30,7 @@ public class TestService(
         module.Tests.Add(new Test
         {
             Title = testDto.Title,
+            CreatedAt = DateTime.UtcNow,
             Questions = testDto.Questions.Select(x => new Question
             {
                 Title = x.Title,
