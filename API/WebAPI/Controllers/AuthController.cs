@@ -2,6 +2,7 @@ using Application.Auth;
 using Application.Auth.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Controllers;
 
 namespace WebAPI.Controller;
 

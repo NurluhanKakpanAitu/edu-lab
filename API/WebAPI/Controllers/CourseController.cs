@@ -8,6 +8,7 @@ namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CourseController(ICourseService courseService) : BaseController
 {
     [HttpPost]

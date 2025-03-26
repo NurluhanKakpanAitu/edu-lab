@@ -9,6 +9,7 @@ namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TestController(ITestService testService) : BaseController
 {
     [HttpPost]

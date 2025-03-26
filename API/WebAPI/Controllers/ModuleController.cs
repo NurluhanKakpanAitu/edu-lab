@@ -1,5 +1,6 @@
 using Application.Modules;
 using Application.Modules.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controller;
 
@@ -7,6 +8,7 @@ namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ModuleController(IModuleService moduleService) : BaseController
 {
     [HttpPost]

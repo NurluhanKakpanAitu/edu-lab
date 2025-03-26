@@ -1,8 +1,9 @@
 using Application;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Controller;
 
-namespace WebAPI.Controller;
+namespace WebAPI.Controllers;
 
 public class FileController(IMinioFileService minioFileService) : BaseController
 {
