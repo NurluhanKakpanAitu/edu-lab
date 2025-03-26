@@ -12,6 +12,4 @@ public abstract class BaseController : ControllerBase
     protected IActionResult ResponseOk() => Ok(ApiResponse<object>.CreateSuccess(null));
     
     protected IActionResult ResponseFail(string message) => Ok(ApiResponse<object>.CreateFailure(message));
-    
-    
 }
