@@ -19,7 +19,7 @@ public class ApiResponse<T>
     /// <summary>
     /// The error message if the operation failed.
     /// </summary>
-    public string? ErrorMessage { get; set; }
+    public string? ErrorCode { get; set; }
 
     /// <summary>
     /// Creates a success response with data.
@@ -32,7 +32,7 @@ public class ApiResponse<T>
         {
             Data = data,
             Success = true,
-            ErrorMessage = null
+            ErrorCode = null
         };
     }
 
@@ -47,7 +47,7 @@ public class ApiResponse<T>
         {
             Data = default,
             Success = false,
-            ErrorMessage = errorMessage
+            ErrorCode = errorMessage
         };
     }
 }

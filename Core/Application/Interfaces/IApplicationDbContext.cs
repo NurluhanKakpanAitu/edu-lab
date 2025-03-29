@@ -12,15 +12,7 @@ public interface IApplicationDbContext
     
     public DbSet<Module> Modules { get; set; }
     
-    public DbSet<Test> Tests { get; set; }
-    
-    public DbSet<Question> Questions { get; set; }
-    
-    public DbSet<Answer> Answers { get; set; }
-    
     public DbSet<PracticeWork> PracticeWorks { get; set; }
-    
-    public DbSet<UserTestResult> UserTestResults { get; set; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

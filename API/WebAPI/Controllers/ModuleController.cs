@@ -31,11 +31,4 @@ public class ModuleController(IModuleService moduleService) : BaseController
         await moduleService.DeleteAsync(id, cancellationToken);
         return ResponseOk();
     }
-    
-    [HttpGet("{courseId:guid}")]
-    public async Task<IActionResult> GetAllAsync([FromRoute] Guid courseId, CancellationToken cancellationToken = default)
-    {
-        var modules = await moduleService.GetAllAsync(courseId, cancellationToken);
-        return ResponseOk(modules);
-    }
 }

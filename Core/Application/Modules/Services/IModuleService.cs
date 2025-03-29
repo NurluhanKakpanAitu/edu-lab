@@ -7,6 +7,4 @@ public interface IModuleService
     Task UpdateAsync(Guid id, ModuleDto moduleDto, CancellationToken cancellationToken = default);
     
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
-    
-    Task<IEnumerable<ModuleGetAllVm>> GetAllAsync(Guid courseId, CancellationToken cancellationToken = default);
 }

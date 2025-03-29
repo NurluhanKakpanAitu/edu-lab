@@ -5,9 +5,9 @@ namespace Domain.Entities;
 
 public class Module : BaseEntity, IAuditable
 {
-    public required Translation Title { get; set; }
+    public required string Title { get; set; }
     
-    public required Translation Description { get; set; }
+    public string? Description { get; set; }
     
     public string? VideoPath { get; set; }
     
@@ -20,5 +20,7 @@ public class Module : BaseEntity, IAuditable
     [ForeignKey(nameof(CourseId))]
     public Course? Course { get; set; }
     
-    public List<Test> Tests { get; set; } = [];
+    public string? TaskPath { get; set; }
+    
+    public List<PracticeWork> PracticeWorks { get; init; } = [];
 }

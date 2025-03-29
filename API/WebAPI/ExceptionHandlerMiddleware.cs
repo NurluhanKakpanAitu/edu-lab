@@ -28,7 +28,7 @@ namespace WebAPI
             {
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = 401;
-                return context.Response.WriteAsync(JsonSerializer.Serialize(ApiResponse<object>.CreateFailure(exception.Message), new JsonSerializerOptions
+                return context.Response.WriteAsync(JsonSerializer.Serialize(ApiResponse<object>.CreateFailure("Unauthorized"), new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 }));

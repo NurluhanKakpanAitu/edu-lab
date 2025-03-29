@@ -11,7 +11,7 @@ public interface ICourseService
     
     Task DeleteCourse(Guid courseId, CancellationToken cancellationToken = default);
     
-    Task<List<CourseGetAllVm>> GetAllCourses(CancellationToken cancellationToken = default);
+    Task<List<CourseVm>> GetAllCourses(CancellationToken cancellationToken = default);
     
-    Task<CourseGetByIdVm> GetCourse(Guid courseId, CancellationToken cancellationToken = default);
+    Task<CourseVm> GetCourse(Guid courseId, CancellationToken cancellationToken = default);
 }

@@ -58,24 +58,4 @@ public class ModuleService(IApplicationDbContext dbContext) : IModuleService
         
         await dbContext.SaveChangesAsync(cancellationToken);
     }
-
-    public async Task<IEnumerable<ModuleGetAllVm>> GetAllAsync(Guid courseId, CancellationToken cancellationToken = default)
-    {
-        return await dbContext.Modules
-            .AsNoTracking()
-            .Where(x => x.CourseId == courseId)
-            .Select(x => new ModuleGetAllVm
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Description = x.Description,
-                VideoPath = x.VideoPath,
-                Order = x.Order,
-                CourseId = x.CourseId,
-                CreatedAt = x.CreatedAt
-            })
-            .OrderBy(x => x.Order)
-            .ThenBy(x => x.CreatedAt)
-            .ToListAsync(cancellationToken);
-    }
 }

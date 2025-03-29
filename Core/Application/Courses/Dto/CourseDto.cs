@@ -1,12 +1,10 @@
-using Domain.Entities.Base;
-
 namespace Application.Courses.Dto;
 
 public class CourseDto
 {
-    public Translation Title { get; set; } = null!;
+    public required string Title { get; init; } 
     
-    public Translation Description { get; set; } = null!;
+    public string? Description { get; set; }
     
     public string? ImagePath { get; set; }
 }

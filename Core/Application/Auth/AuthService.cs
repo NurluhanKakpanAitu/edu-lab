@@ -30,7 +30,7 @@ public class AuthService(
     {
         var user = await context.Users.FirstOrDefaultAsync(x => x.Email == email);
         if (user == null || !VerifyPassword(password, user.Password!))
-            throw new UnauthorizedAccessException("Email или пароль неверны.");
+            throw new Exception("emailOrPasswordNotValid");
         
         var refreshToken = Guid.NewGuid().ToString();
         user.RefreshToken = refreshToken;

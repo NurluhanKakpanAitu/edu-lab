@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Application.Interfaces;
 using Domain.Entities;
 
@@ -19,57 +18,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         
         modelBuilder.Entity<Module>()
             .OwnsOne(x => x.Description, pr => pr.ToJson());
-        
-        modelBuilder.Entity<Test>()
-            .OwnsOne(x => x.Title, pr => pr.ToJson());
-        
-        modelBuilder.Entity<Question>()
-            .OwnsOne(x => x.Title, pr =>
-            {
-                pr.Property(x => x.En).HasColumnName("TitleEn");
-                
-                pr.Property(x => x.Ru).HasColumnName("TitleRu");
-                
-                pr.Property(x => x.Kz).HasColumnName("TitleKz");
-            });
-        
-        modelBuilder.Entity<Answer>()
-            .OwnsOne(x => x.Title, pr =>
-            {
-                pr.Property(x => x.En).HasColumnName("TitleEn");
-                
-                pr.Property(x => x.Ru).HasColumnName("TitleRu");
-                
-                pr.Property(x => x.Kz).HasColumnName("TitleKz");
-            });
 
         modelBuilder.Entity<PracticeWork>()
             .OwnsOne(x => x.Title, pr => pr.ToJson());
-        
-        modelBuilder.Entity<PracticeWork>()
-            .OwnsOne(x => x.Description, pr =>
-            {
-                pr.Property(x => x.En).HasColumnName("DescriptionEn");
-                
-                pr.Property(x => x.Ru).HasColumnName("DescriptionRu");
-                
-                pr.Property(x => x.Kz).HasColumnName("DescriptionKz");
-            });
-
-        modelBuilder.Entity<UserTestResult>()
-            .Property(u => u.TestResults)
-            .HasConversion(
-                v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),  // Serialize
-                v => JsonSerializer.Deserialize<List<TestResult>>(v, new JsonSerializerOptions())!  // Deserialize
-            );
         
         base.OnModelCreating(modelBuilder);
     }
 
 
     public DbSet<User> Users { get; set; }
-    
-    public DbSet<UserTestResult> UserTestResults { get; set; }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -79,12 +36,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Course> Courses { get; set; }
     
     public DbSet<Module> Modules { get; set; }
-    
-    public DbSet<Test> Tests { get; set; }
-    
-    public DbSet<Question> Questions { get; set; }
-    
-    public DbSet<Answer> Answers { get; set; }
     
     public DbSet<PracticeWork> PracticeWorks { get; set; }
 }

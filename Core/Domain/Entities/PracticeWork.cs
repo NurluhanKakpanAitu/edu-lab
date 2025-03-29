@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Domain.Entities.Base;
 
 namespace Domain.Entities;
 
@@ -7,9 +6,9 @@ public class PracticeWork : BaseEntity
 {
     public DateTime CreatedAt { get; set; }
     
-    public Translation Title { get; set; } = new();
+    public required string Title { get; set; } 
     
-    public Translation Description { get; set; } = new();
+    public required string Description { get; set; }
     
     public string? ImagePath { get; set; }
     
