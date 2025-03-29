@@ -1,14 +1,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Entities.Base;
 
 namespace Domain.Entities;
 
-public class PracticeWork : BaseEntity
+public class PracticeWork : BaseEntity, IAuditable
 {
-    public DateTime CreatedAt { get; set; }
+    public string? Title { get; set; } 
     
-    public required string Title { get; set; } 
-    
-    public required string Description { get; set; }
+    public string? Description { get; set; }
     
     public string? ImagePath { get; set; }
     
@@ -16,4 +15,6 @@ public class PracticeWork : BaseEntity
     
     [ForeignKey(nameof(ModuleId))]
     public Module? Module { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 }
