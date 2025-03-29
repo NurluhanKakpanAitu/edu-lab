@@ -2,7 +2,6 @@ using Application.Modules;
 using Application.Modules.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Controller;
 
 namespace WebAPI.Controllers;
 
@@ -30,5 +29,13 @@ public class ModuleController(IModuleService moduleService) : BaseController
     {
         await moduleService.DeleteAsync(id, cancellationToken);
         return ResponseOk();
+    }
+    
+    [HttpGet("{id:guid}")]
+    [Authorize]
+    public async Task<IActionResult> GetModule([FromRoute] Guid id, CancellationToken cancellationToken = default)
+    {
+        var module = await moduleService.GetModule(id, cancellationToken);
+        return ResponseOk(module);
     }
 }

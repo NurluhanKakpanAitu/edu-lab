@@ -26,14 +26,6 @@ public interface IAuthService
     /// <param name="password">The password for the new user.</param>
     /// <returns>Returns the user ID or status of the operation.</returns>
     Task<TokenVm> Register(string email, string password);
-
-    /// <summary>
-    /// Registers a new user using a Google account.
-    /// </summary>
-    /// <param name="googleToken">The Google account token.</param>
-    /// <returns>Returns the user ID or status of the operation.</returns>
-    Task<string?> WithGoogle(string googleToken);
-    
     
     Task<UserVm> GetInfo(CancellationToken cancellationToken = default);
     

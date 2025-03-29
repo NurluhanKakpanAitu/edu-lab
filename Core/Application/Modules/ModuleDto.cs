@@ -13,4 +13,6 @@ public class ModuleDto
     public Guid CourseId { get; set; }
     
     public string? TaskPath { get; set; }
+    
+    public string? PresentationPath { get; set; }
 }

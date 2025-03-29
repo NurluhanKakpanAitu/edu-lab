@@ -63,10 +63,14 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PresentationPath")
+                        .HasColumnType("text");
+
                     b.Property<string>("TaskPath")
                         .HasColumnType("text");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("VideoPath")

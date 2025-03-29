@@ -31,4 +31,8 @@ public class ModuleVm
     public DateTime CreatedAt { get; set; }
     
     public string? TaskPath { get; set; }
+    
+    public string? PresentationPath { get; set; }
+    
+    public Guid CourseId { get; set; }
 }

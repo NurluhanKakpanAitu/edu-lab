@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Infrastructure.Persistence.Infrastructure.Persistence
+namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250329074047_Updating")]
-    partial class Updating
+    [Migration("20250329120611_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,10 +66,14 @@ namespace Infrastructure.Persistence.Infrastructure.Persistence
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
+                    b.Property<string>("PresentationPath")
+                        .HasColumnType("text");
+
                     b.Property<string>("TaskPath")
                         .HasColumnType("text");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("VideoPath")

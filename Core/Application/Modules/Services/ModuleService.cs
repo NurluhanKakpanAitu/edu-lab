@@ -1,3 +1,4 @@
+using Application.Courses.Vm;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,9 @@ public class ModuleService(IApplicationDbContext dbContext) : IModuleService
             Order = moduleDto.Order,
             CourseId = moduleDto.CourseId,
             Id = Guid.NewGuid(),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            TaskPath = moduleDto.TaskPath,
+            PresentationPath = moduleDto.PresentationPath
         };
         
         await dbContext.Modules.AddAsync(module, cancellationToken);
@@ -43,6 +46,8 @@ public class ModuleService(IApplicationDbContext dbContext) : IModuleService
             module.VideoPath = moduleDto.VideoPath;
             module.Order = moduleDto.Order;
             module.CourseId = moduleDto.CourseId;
+            module.TaskPath = moduleDto.TaskPath;
+            module.PresentationPath = moduleDto.PresentationPath;
             
             await dbContext.SaveChangesAsync(cancellationToken);
     }
@@ -57,5 +62,28 @@ public class ModuleService(IApplicationDbContext dbContext) : IModuleService
         dbContext.Modules.Remove(module);
         
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<ModuleVm> GetModule(Guid id, CancellationToken cancellationToken = default)
+    {
+        var module = await dbContext.Modules
+            .Include(x => x.Course)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        
+        if (module == null)
+            throw new Exception("Module not found");
+        
+        return new ModuleVm
+        {
+            Id = module.Id,
+            Title = module.Title,
+            Description = module.Description,
+            VideoPath = module.VideoPath,
+            Order = module.Order,
+            CreatedAt = module.CreatedAt,
+            TaskPath = module.TaskPath,
+            PresentationPath = module.PresentationPath,
+            CourseId = module.CourseId
+        };
     }
 }

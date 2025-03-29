@@ -5,7 +5,7 @@ namespace Domain.Entities;
 
 public class Module : BaseEntity, IAuditable
 {
-    public string? Title { get; set; }
+    public required string Title { get; set; }
     
     public string? Description { get; set; }
     
@@ -23,4 +23,6 @@ public class Module : BaseEntity, IAuditable
     public string? TaskPath { get; set; }
     
     public List<PracticeWork> PracticeWorks { get; init; } = [];
+    
+    public string? PresentationPath { get; set; }
 }

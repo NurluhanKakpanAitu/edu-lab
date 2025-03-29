@@ -2,9 +2,8 @@ using Application.Auth;
 using Application.Auth.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Controllers;
 
-namespace WebAPI.Controller;
+namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -47,21 +46,6 @@ public class AuthController(IAuthService authService) : BaseController
             return BadRequest("Электронная почта и пароль обязательны.");
         
         var token = await authService.Register(request.Email, request.Password);
-        return ResponseOk(token);
-    }
-
-    /// <summary>
-    /// Registers or logs in a user using a Google token.
-    /// </summary>
-    [HttpPost("with-google")]
-    [AllowAnonymous]
-    public async Task<IActionResult> WithGoogle([FromBody] GoogleRegisterRequest request)
-    {
-        if (string.IsNullOrEmpty(request.Token))
-            return ResponseFail("Google token is required.");
-        
-        var token = await authService.WithGoogle(request.Token);
-        
         return ResponseOk(token);
     }
     
