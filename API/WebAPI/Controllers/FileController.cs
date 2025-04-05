@@ -55,4 +55,19 @@ public class FileController(IMinioFileService minioFileService) : BaseController
             return ResponseFail($"An error occurred: {ex.Message}");
         }
     }
+    
+    [HttpGet("base64/{objectName}")]
+    public async Task<IActionResult> DownloadFileAsBase64([FromRoute] string objectName)
+    {
+        try
+        {
+            var response = await minioFileService.DownloadFileAsync(objectName);
+
+            return ResponseOk(response);
+        }
+        catch (Exception ex)
+        {
+            return ResponseFail($"An error occurred: {ex.Message}");
+        }
+    }
 }

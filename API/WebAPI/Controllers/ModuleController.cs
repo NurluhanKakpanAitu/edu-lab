@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Application.Modules;
 using Application.Modules.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,7 @@ namespace WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+// [Authorize]
 public class ModuleController(IModuleService moduleService) : BaseController
 {
     [HttpPost]
@@ -38,4 +39,58 @@ public class ModuleController(IModuleService moduleService) : BaseController
         var module = await moduleService.GetModule(id, cancellationToken);
         return ResponseOk(module);
     }
+    
+    [HttpPost("run")]
+    public IActionResult RunCode([FromBody] CodeRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Code))
+        {
+            return BadRequest(new { error = "Code cannot be empty." });
+        }
+
+        try
+        {
+            // Create a temporary Python file
+            var tempFileName = Path.GetTempFileName() + ".py";
+            System.IO.File.WriteAllText(tempFileName, request.Code);
+
+            // Execute the Python file
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "python3", 
+                    Arguments = tempFileName,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            process.Start();
+
+            // Capture output and errors
+            var output = process.StandardOutput.ReadToEnd();
+            var error = process.StandardError.ReadToEnd();
+
+            process.WaitForExit();
+
+            // Delete the temporary file
+            System.IO.File.Delete(tempFileName);
+
+            return Ok(new
+            {
+                output, error
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
+}
+public class CodeRequest
+{
+    public string Code { get; set; }
 }
