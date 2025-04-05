@@ -8,10 +8,10 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["API/WebAPI/WebAPI.csproj", "API/WebAPI/"]
-COPY ["Infrastructure/Infrastructure.Persistence/Infrastructure.Persistence.csproj", "Infrastructure/Infrastructure.Persistence/"]
-COPY ["Core/Domain/Domain.csproj", "Core/Domain/"]
-COPY ["Core/Application/Application.csproj", "Core/Application/"]
 COPY ["Infrastructure/Infrastructure.File/Infrastructure.File.csproj", "Infrastructure/Infrastructure.File/"]
+COPY ["Core/Application/Application.csproj", "Core/Application/"]
+COPY ["Core/Domain/Domain.csproj", "Core/Domain/"]
+COPY ["Infrastructure/Infrastructure.Persistence/Infrastructure.Persistence.csproj", "Infrastructure/Infrastructure.Persistence/"]
 RUN dotnet restore "API/WebAPI/WebAPI.csproj"
 COPY . .
 WORKDIR "/src/API/WebAPI"
