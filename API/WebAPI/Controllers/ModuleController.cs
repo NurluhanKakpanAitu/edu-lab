@@ -50,43 +50,58 @@ public class ModuleController(IModuleService moduleService) : BaseController
 
         try
         {
-            // Create a temporary Python file
-            var tempFileName = Path.GetTempFileName() + ".py";
+            // Create a temporary Python file in a directory with write permissions
+            const string tempDir = "/tmp"; // Use /tmp directory on Linux
+            var tempFileName = Path.Combine(tempDir, Path.GetRandomFileName() + ".py");
             System.IO.File.WriteAllText(tempFileName, request.Code);
 
-            // Execute the Python file
+            // Execute the Python file with full path
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "python3", 
+                    FileName = "/usr/bin/python3", // Use full path to Python
                     Arguments = tempFileName,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    WorkingDirectory = tempDir // Set working directory explicitly
                 }
             };
 
-            process.Start();
+            string output;
+            string error;
 
-            // Capture output and errors
-            var output = process.StandardOutput.ReadToEnd();
-            var error = process.StandardError.ReadToEnd();
-
-            process.WaitForExit();
-
-            // Delete the temporary file
-            System.IO.File.Delete(tempFileName);
-
-            return Ok(new
+            try
             {
-                output, error
-            });
+                process.Start();
+                output = process.StandardOutput.ReadToEnd();
+                error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = $"Process execution failed: {ex.Message}" });
+            }
+            finally
+            {
+                // Cleanup
+                try
+                {
+                    if (System.IO.File.Exists(tempFileName))
+                    {
+                        System.IO.File.Delete(tempFileName);
+                    }
+                }
+                catch { /* Ignore cleanup errors */ }
+            }
+
+            return Ok(new { output, error });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { error = ex.Message });
+            return StatusCode(500, new { error = $"Server error: {ex.Message}" });
         }
     }
 }
