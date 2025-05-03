@@ -7,6 +7,17 @@
     ports:
       - "5000:8080"
       - "5001:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Username=postgres;Password=123456;Database=edu_lab_db
+      - Minio__Endpoint=minio:9000
+      - Minio__AccessKey=minio_admin
+      - Minio__SecretKey=12345678
+      - Minio__BucketName=course
+      - Minio__UseSSL=false
+    depends_on:
+      - postgres
+      - minio
 
   postgres:
     image: postgres:latest
