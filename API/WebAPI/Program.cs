@@ -73,6 +73,23 @@ builder.Services.AddCors(options =>
     });
 });
 
+var tempDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp");
+if (!Directory.Exists(tempDir))
+{
+    Directory.CreateDirectory(tempDir);
+}
+
+// Give appropriate permissions to the temp directory
+try
+{
+    var dirInfo = new DirectoryInfo(tempDir);
+    dirInfo.Attributes &= ~FileAttributes.ReadOnly;
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Warning: Could not set directory permissions: {ex.Message}");
+}
+
 
 var app = builder.Build();
 

@@ -41,72 +41,79 @@ public class ModuleController(IModuleService moduleService) : BaseController
     }
     
     [HttpPost("run")]
-    public IActionResult RunCode([FromBody] CodeRequest request)
+public IActionResult RunCode([FromBody] CodeRequest request)
+{
+    if (string.IsNullOrWhiteSpace(request.Code))
     {
-        if (string.IsNullOrWhiteSpace(request.Code))
-        {
-            return BadRequest(new { error = "Code cannot be empty." });
-        }
+        return BadRequest(new { error = "Code cannot be empty." });
+    }
 
-        var tempDir = "/var/www/yourapp/temp";
+    // Use the application's base directory for temp files
+    var tempDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp");
     
+    // Create temp directory if it doesn't exist
+    if (!Directory.Exists(tempDir))
+    {
+        Directory.CreateDirectory(tempDir);
+    }
+
+    try
+    {
+        // Create a temporary Python file with unique name
+        var tempFileName = Path.Combine(tempDir, $"{Guid.NewGuid()}.py");
+        System.IO.File.WriteAllText(tempFileName, request.Code);
+
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "python3",
+                Arguments = tempFileName,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = tempDir
+            }
+        };
+
         try
         {
-            // Create a temporary Python file with unique name
-            var tempFileName = Path.Combine(tempDir, $"{Guid.NewGuid()}.py");
-            System.IO.File.WriteAllText(tempFileName, request.Code);
-
-            var process = new Process
+            process.Start();
+            
+            // Add timeout
+            if (!process.WaitForExit(10000)) // 10 second timeout
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/usr/bin/python3", // Full path to Python
-                    Arguments = tempFileName,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WorkingDirectory = tempDir
-                }
-            };
+                process.Kill();
+                return StatusCode(408, new { error = "Execution timeout" });
+            }
 
+            var output = process.StandardOutput.ReadToEnd();
+            var error = process.StandardError.ReadToEnd();
+
+            return Ok(new { output, error });
+        }
+        finally
+        {
+            // Cleanup
             try
             {
-                process.Start();
-            
-                // Add timeout
-                if (!process.WaitForExit(10000)) // 10 second timeout
+                if (System.IO.File.Exists(tempFileName))
                 {
-                    process.Kill();
-                    return StatusCode(408, new { error = "Execution timeout" });
+                    System.IO.File.Delete(tempFileName);
                 }
-
-                var output = process.StandardOutput.ReadToEnd();
-                var error = process.StandardError.ReadToEnd();
-
-                return Ok(new { output, error });
             }
-            finally
+            catch 
             {
-                // Cleanup
-                try
-                {
-                    if (System.IO.File.Exists(tempFileName))
-                    {
-                        System.IO.File.Delete(tempFileName);
-                    }
-                }
-                catch 
-                {
-                    // Log cleanup errors but don't fail the request
-                }
+                // Log cleanup errors but don't fail the request
             }
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { error = $"Execution error: {ex.Message}" });
         }
     }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = $"Execution error: {ex.Message}" });
+    }
+}
 }
 public class CodeRequest
 {
