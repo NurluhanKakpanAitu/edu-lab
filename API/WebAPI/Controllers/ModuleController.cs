@@ -48,41 +48,43 @@ public class ModuleController(IModuleService moduleService) : BaseController
             return BadRequest(new { error = "Code cannot be empty." });
         }
 
+        var tempDir = "/var/www/yourapp/temp";
+    
         try
         {
-            // Create a temporary Python file in a directory with write permissions
-            const string tempDir = "/tmp"; // Use /tmp directory on Linux
-            var tempFileName = Path.Combine(tempDir, Path.GetRandomFileName() + ".py");
+            // Create a temporary Python file with unique name
+            var tempFileName = Path.Combine(tempDir, $"{Guid.NewGuid()}.py");
             System.IO.File.WriteAllText(tempFileName, request.Code);
 
-            // Execute the Python file with full path
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "/usr/bin/python3", // Use full path to Python
+                    FileName = "/usr/bin/python3", // Full path to Python
                     Arguments = tempFileName,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    WorkingDirectory = tempDir // Set working directory explicitly
+                    WorkingDirectory = tempDir
                 }
             };
-
-            string output;
-            string error;
 
             try
             {
                 process.Start();
-                output = process.StandardOutput.ReadToEnd();
-                error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = $"Process execution failed: {ex.Message}" });
+            
+                // Add timeout
+                if (!process.WaitForExit(10000)) // 10 second timeout
+                {
+                    process.Kill();
+                    return StatusCode(408, new { error = "Execution timeout" });
+                }
+
+                var output = process.StandardOutput.ReadToEnd();
+                var error = process.StandardError.ReadToEnd();
+
+                return Ok(new { output, error });
             }
             finally
             {
@@ -94,14 +96,15 @@ public class ModuleController(IModuleService moduleService) : BaseController
                         System.IO.File.Delete(tempFileName);
                     }
                 }
-                catch { /* Ignore cleanup errors */ }
+                catch 
+                {
+                    // Log cleanup errors but don't fail the request
+                }
             }
-
-            return Ok(new { output, error });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { error = $"Server error: {ex.Message}" });
+            return StatusCode(500, new { error = $"Execution error: {ex.Message}" });
         }
     }
 }
