@@ -9,7 +9,7 @@
       - "5001:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Username=postgres;Password=123456;Database=edu_lab_db
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Username=postgres;Password=123456;Database=postgres
       - Minio__Endpoint=minio:9000
       - Minio__AccessKey=minio_admin
       - Minio__SecretKey=12345678
