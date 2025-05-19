@@ -1,4 +1,6 @@
-﻿services:
+﻿version: '3.9'
+
+services:
   webapi:
     image: webapi
     build:
@@ -9,13 +11,27 @@
       - "5001:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Username=edu_lab_user;Password=edu_lab_password;Database=edu_lab_db
       - Minio__Endpoint=minio:9000
       - Minio__AccessKey=minio_admin
       - Minio__SecretKey=12345678
       - Minio__BucketName=course
       - Minio__UseSSL=false
     depends_on:
+      - postgres
       - minio
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: edu_lab_user
+      POSTGRES_PASSWORD: edu_lab_password
+      POSTGRES_DB: edu_lab_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    # ❗️НЕ прокидываем порт наружу!
+    expose:
+      - "5432"
 
   minio:
     image: minio/minio:latest
@@ -30,4 +46,5 @@
     command: server /data --console-address ":9001"
 
 volumes:
+  pg_data:
   minio_data:
